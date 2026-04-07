@@ -1,0 +1,11 @@
+# Build artifacts
+*.jar
+*.class
+
+# IDE files
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
