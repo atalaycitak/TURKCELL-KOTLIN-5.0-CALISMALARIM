@@ -1,17 +1,33 @@
 package com.turkcell.libraryapp.data.repository
 
+import com.turkcell.libraryapp.data.supabase.supabase
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.builtin.Email
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
 class AuthRepository
 {
     suspend fun signIn(email: String, password:String) : Result<Unit> = runCatching {
-        delay(2000) // dışarıya istek atıyomuş gibi
+        supabase.auth.signInWith(Email) {
+            this.email = email
+            this.password = password
+        }
+    }
 
-        val isSuccess = Random.nextBoolean() // %50 %50
-        if(isSuccess)
-            Unit
-        else
-            throw Exception("Fake login failed")
+    suspend fun signUp(
+        email: String,
+        password: String,
+        fullName: String,
+        studentNo: String?
+    ) : Result<Unit> = runCatching {
+        supabase.auth.signUpWith(Email){
+            this.email = email
+            this.password = password
+        }
+
+        val userId = supabase.auth.currentUserOrNull()?.id ?: error("Kullanıcı bulunamadı")
+        println(userId)
+        // Bu userId'i al kendi tablona yaz, profil ile userı bağla.
     }
 }

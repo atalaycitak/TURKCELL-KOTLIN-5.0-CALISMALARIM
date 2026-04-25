@@ -14,6 +14,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,10 +30,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.turkcell.libraryapp.ui.viewmodel.AuthState
 import com.turkcell.libraryapp.ui.viewmodel.AuthViewModel
-import io.github.jan.supabase.auth.Auth
 
 @Composable
 fun LoginScreen(
+    onNavigateToRegister: () -> Unit = {}
 ) {
 
     //LaunchedEffect() { }
@@ -94,5 +95,11 @@ fun LoginScreen(
             Text("Giriş Yapıldı")
         else if(authState is AuthState.Error)
             Text((authState as AuthState.Error).message)
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        TextButton(onClick = onNavigateToRegister) {
+            Text("Hesabın yok mu? Kayıt Ol")
+        }
     }
 }
