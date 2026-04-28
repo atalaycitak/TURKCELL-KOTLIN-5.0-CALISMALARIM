@@ -36,17 +36,24 @@ import io.github.jan.supabase.auth.Auth
 // TODO: Kayıt ol sayfası tasarlamak.
 @Composable
 fun LoginScreen(
-    onNavigateToRegister: () -> Unit
+    onNavigateToRegister: () -> Unit,
+    onLoginSuccess: (role:String) -> Unit,
+    authViewModel: AuthViewModel
 ) {
-
-    //LaunchedEffect() { }
-
-    val authViewModel: AuthViewModel = viewModel() // Navigasyon ekranına taşı.
     val authState by authViewModel.authState.collectAsState()
-
-
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+
+    // Yalnızca authState değişirse çalış, tüm recompositionlarda değil..
+    LaunchedEffect(authState) {
+        if(authState is AuthState.Success)
+        {
+            onLoginSuccess((authState as AuthState.Success).role)
+            authViewModel.resetState()
+        }
+    }
+
 
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp),
