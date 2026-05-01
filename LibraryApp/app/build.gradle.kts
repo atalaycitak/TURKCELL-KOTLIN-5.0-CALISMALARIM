@@ -8,7 +8,11 @@ plugins {
 
 android {
     namespace = "com.turkcell.libraryapp"
-    compileSdk = 36
+    compileSdk {
+        version = release(36) {
+            minorApiLevel = 1
+        }
+    }
 
     defaultConfig {
         applicationId = "com.turkcell.libraryapp"
@@ -63,7 +67,7 @@ dependencies {
 
 
 
-    implementation(platform(libs.supabase.bom))
+    implementation(libs.supabase.bom)
     implementation(libs.supabase.postgrest)
     implementation(libs.supabase.auth)
 

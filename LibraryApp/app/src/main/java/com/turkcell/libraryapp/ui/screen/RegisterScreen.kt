@@ -1,4 +1,4 @@
-package com.example.halit.ui.screen.auth
+package com.turkcell.libraryapp.ui.screen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -8,18 +8,19 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.turkcell.libraryapp.ui.viewmodel.AuthState
 import com.turkcell.libraryapp.ui.viewmodel.AuthViewModel
 
 @Composable
 fun RegisterScreen(
     onNavigateToLogin: () -> Unit,
+    onRegisterSuccess: () -> Unit,
     authViewModel: AuthViewModel
 ) {
     val authState by authViewModel.authState.collectAsState()
@@ -28,6 +29,13 @@ fun RegisterScreen(
     var fullName by remember { mutableStateOf("") }
     var studentNo by remember { mutableStateOf("") }
 
+    // ÖDEV 1: Kayıt başarılı olduğunda Login ekranına yönlendir.
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Success) {
+            authViewModel.resetState()
+            onRegisterSuccess()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -84,10 +92,20 @@ fun RegisterScreen(
         )
         Spacer(modifier = Modifier.height(24.dp))
 
+        // Hata mesajı göster
         if (authState is AuthState.Error) {
             Text(
                 text = (authState as AuthState.Error).message,
                 color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+        }
+
+        // Başarı mesajı göster
+        if (authState is AuthState.Success) {
+            Text(
+                text = "Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...",
+                color = Color(0xFF4CAF50),
                 modifier = Modifier.padding(bottom = 12.dp)
             )
         }
@@ -116,7 +134,7 @@ fun RegisterScreen(
         }
         Spacer(modifier = Modifier.height(12.dp))
 
-        TextButton(onClick = {onNavigateToLogin()}) {
+        TextButton(onClick = { onNavigateToLogin() }) {
             Text("Zaten hesabın var mı? Giriş Yap")
         }
     }
