@@ -19,10 +19,8 @@ fun SplashScreen(
     onAuthenticated: (String) -> Unit,
     onUnauthenticated: () -> Unit
 ) {
-    // hesaplama sonucunu oku..
     val sessionState by authViewModel.sessionState.collectAsState();
 
-    // hesaplama sonucu her değiştiğinde..
     LaunchedEffect(sessionState) {
         when (val s = sessionState)
         {

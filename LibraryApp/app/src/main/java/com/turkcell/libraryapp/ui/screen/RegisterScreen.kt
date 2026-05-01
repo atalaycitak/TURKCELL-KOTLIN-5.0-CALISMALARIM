@@ -29,7 +29,6 @@ fun RegisterScreen(
     var fullName by remember { mutableStateOf("") }
     var studentNo by remember { mutableStateOf("") }
 
-    // ÖDEV 1: Kayıt başarılı olduğunda Login ekranına yönlendir.
     LaunchedEffect(authState) {
         if (authState is AuthState.Success) {
             authViewModel.resetState()
@@ -92,7 +91,6 @@ fun RegisterScreen(
         )
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Hata mesajı göster
         if (authState is AuthState.Error) {
             Text(
                 text = (authState as AuthState.Error).message,
@@ -101,7 +99,6 @@ fun RegisterScreen(
             )
         }
 
-        // Başarı mesajı göster
         if (authState is AuthState.Success) {
             Text(
                 text = "Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...",

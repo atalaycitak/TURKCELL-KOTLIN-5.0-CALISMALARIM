@@ -49,16 +49,14 @@ fun HomeScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Ödünç alma başarılı olduğunda
     LaunchedEffect(borrowSuccess) {
         if (borrowSuccess) {
             snackbarHostState.showSnackbar("Kitap başarıyla ödünç alındı!")
             borrowViewModel.resetBorrowSuccess()
-            bookViewModel.loadBooks() // Listeyi yenile
+            bookViewModel.loadBooks()
         }
     }
 
-    // Ödünç alma hatası
     LaunchedEffect(borrowError) {
         if (borrowError != null) {
             snackbarHostState.showSnackbar(borrowError ?: "Hata oluştu")
@@ -71,7 +69,6 @@ fun HomeScreen(
             .padding(top = 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Üst kısım: Arama ve Kiralamalarım butonu
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -92,18 +89,16 @@ fun HomeScreen(
         }
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Kiralamalarım butonu
         OutlinedButton(
             onClick = onNavigateToMyBorrows,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
         ) {
-            Text("📚 Kiralamalarım")
+            Text("Kiralamalarım")
         }
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Snackbar
         SnackbarHost(hostState = snackbarHostState)
 
         when {

@@ -41,7 +41,6 @@ fun BookCard(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            // Kitap başlığı
             Text(
                 text = book.title,
                 fontSize = 18.sp,
@@ -49,7 +48,6 @@ fun BookCard(
             )
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Yazar bilgisi
             Text(
                 text = "Yazar: ${book.author}",
                 fontSize = 14.sp,
@@ -57,7 +55,6 @@ fun BookCard(
             )
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Kategori ve sayfa sayısı
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -77,7 +74,6 @@ fun BookCard(
             }
             Spacer(modifier = Modifier.height(4.dp))
 
-            // ISBN ve kopya bilgisi
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -100,7 +96,6 @@ fun BookCard(
             }
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Ödünç Al butonu veya Stokta Yok göstergesi
             if (book.avaiableCopies > 0) {
                 Button(
                     onClick = { onBorrowClick(book.id) },

@@ -30,7 +30,6 @@ fun BorrowCard(
     onReturnClick: (borrowId: String, bookId: String) -> Unit,
     isReturning: Boolean = false
 ) {
-    // İade edilmiş mi kontrol et
     val isReturned = borrow.returnedAt != null
 
     Card(
@@ -49,7 +48,6 @@ fun BorrowCard(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            // Durum göstergesi
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -68,7 +66,6 @@ fun BorrowCard(
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Tarih bilgileri
             Text(
                 text = "Ödünç Tarihi: ${borrow.borrowedAt}",
                 fontSize = 13.sp,
@@ -91,7 +88,6 @@ fun BorrowCard(
                 )
             }
 
-            // Henüz iade edilmediyse İade Et butonu göster
             if (!isReturned) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Button(

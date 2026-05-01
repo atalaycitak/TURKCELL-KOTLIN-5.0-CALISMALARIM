@@ -41,7 +41,6 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
 
 
-    // Yalnızca authState değişirse çalış, tüm recompositionlarda değil..
     LaunchedEffect(authState) {
         if(authState is AuthState.Success)
         {

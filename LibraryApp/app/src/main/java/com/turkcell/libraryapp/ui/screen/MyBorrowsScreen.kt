@@ -37,7 +37,6 @@ fun MyBorrowsScreen(
     val isLoading by borrowViewModel.isLoading.collectAsState()
     val error by borrowViewModel.error.collectAsState()
 
-    // Sayfa açıldığında kiralamaları yükle
     val studentId = profile?.userId ?: ""
     LaunchedEffect(studentId) {
         if (studentId.isNotEmpty()) {
@@ -51,7 +50,6 @@ fun MyBorrowsScreen(
             .padding(top = 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Başlık
         Text(
             text = "Kiralamalarım",
             fontSize = 22.sp,
@@ -60,13 +58,11 @@ fun MyBorrowsScreen(
         )
         Spacer(modifier = Modifier.height(4.dp))
 
-        // Geri dön butonu
         TextButton(onClick = onNavigateBack) {
             Text("← Ana Sayfaya Dön")
         }
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Hata mesajı
         if (error != null) {
             Text(
                 text = error ?: "",
