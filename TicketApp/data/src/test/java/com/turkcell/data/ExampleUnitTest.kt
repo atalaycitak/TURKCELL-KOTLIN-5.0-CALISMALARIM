@@ -1,4 +1,4 @@
-package com.turkcell.ticketapp
+package com.turkcell.data
 
 import org.junit.Test
 
