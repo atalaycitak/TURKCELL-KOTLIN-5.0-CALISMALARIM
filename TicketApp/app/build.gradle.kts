@@ -60,11 +60,20 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
+    // DI
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
 
+    // Navigation
     implementation(libs.androidx.navigation.compose)
 
+    // ViewModel+Compose
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.kotlinx.serialization.json)
+
+    // QR Code
+    implementation("io.github.alexzhirkevich:qrose:1.1.2")
+
+    // Material Icons Extended
+    implementation("androidx.compose.material:material-icons-extended")
 }

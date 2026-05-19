@@ -4,6 +4,7 @@ enum class UserRole {
     USER, STAFF, ADMIN;
 
     companion object {
+        // parser func.
         fun fromApi(value: String?): UserRole = when (value?.uppercase()) {
             "ADMIN" -> UserRole.ADMIN
             "STAFF" -> UserRole.STAFF

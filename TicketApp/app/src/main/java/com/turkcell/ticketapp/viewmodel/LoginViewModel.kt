@@ -22,7 +22,7 @@ data class LoginUiState(val email: String = "",
 }
 
 class LoginViewModel(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository //bağımlılık
 ) : ViewModel() {
     private val _state = MutableStateFlow(LoginUiState())
     val state: StateFlow<LoginUiState> = _state.asStateFlow()
@@ -45,6 +45,7 @@ class LoginViewModel(
     }
 }
 
+// Ömürlük
 internal fun Throwable.toUserMessage(): String = when(this)
 {
     is ApiException -> when(code) {

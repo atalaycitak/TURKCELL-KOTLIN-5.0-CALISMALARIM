@@ -2,6 +2,7 @@ package com.turkcell.core.domain
 
 import kotlinx.coroutines.flow.Flow
 
+// Soyut Sözleşme: ne yapılacağını belirtir, nasıl yapılacağını değil.
 interface AuthRepository {
     val isLoggedIn: Flow<Boolean>
 
