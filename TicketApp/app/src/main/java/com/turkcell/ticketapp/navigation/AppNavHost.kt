@@ -45,15 +45,14 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AppNavHost(
-    navController: NavHostController = rememberNavController(),
     authRepository: AuthRepository = koinInject()
 ) {
     val isLoggedIn by authRepository.isLoggedIn.collectAsStateWithLifecycle(initialValue = null)
 
     when (isLoggedIn) {
         null -> SplashScreen()
-        true -> AuthedNavHost(navController, authRepository)
-        false -> UnAuthedNavHost(navController)
+        true -> AuthedNavHost(authRepository)
+        false -> UnAuthedNavHost()
     }
 }
 
@@ -67,9 +66,9 @@ private fun SplashScreen() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AuthedNavHost(
-    navController: NavHostController,
     authRepository: AuthRepository
 ) {
+    val navController: NavHostController = rememberNavController()
     val scope = rememberCoroutineScope()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -171,7 +170,8 @@ private fun AuthedNavHost(
 }
 
 @Composable
-private fun UnAuthedNavHost(navController: NavHostController) {
+private fun UnAuthedNavHost() {
+    val navController: NavHostController = rememberNavController()
     NavHost(navController = navController, startDestination = Login) {
         composable<Login> {
             LoginScreen(

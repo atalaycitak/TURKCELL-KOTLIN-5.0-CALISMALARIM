@@ -52,7 +52,7 @@ val dataModule = module {
     single {
         TokenAuthenticator(
             tokenStore = get(),
-            refreshApiProvider = get(REFRESH_API)
+            refreshApiProvider = { get(REFRESH_API) }
         )
     }
 
