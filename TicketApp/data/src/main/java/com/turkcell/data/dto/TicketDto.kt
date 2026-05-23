@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class EventSummaryDto(
     val id: String,
     val name: String,
-    val venue: String,
+    val place: String,
     val startsAt: String
 )
 

@@ -12,6 +12,9 @@ interface TicketApi {
     @GET("/me/tickets")
     suspend fun getMyTickets(): List<TicketDto>
 
+    @GET("/me/tickets/{id}")
+    suspend fun getTicketById(@Path("id") id: String): TicketDto
+
     @POST("/purchases")
     suspend fun createPurchase(@Body body: PurchaseRequestDto): PurchaseDto
 

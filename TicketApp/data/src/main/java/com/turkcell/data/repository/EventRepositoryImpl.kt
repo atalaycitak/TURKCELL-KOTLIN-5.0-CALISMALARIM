@@ -11,14 +11,14 @@ class EventRepositoryImpl(
 ) : EventRepository {
 
     override suspend fun getUpcomingEvents(): Result<List<Event>> = runCatchingApi {
-        eventApi.getEvents(upcoming = true)
+        eventApi.getEvents()
     }.map { dtoList ->
         dtoList.map { dto ->
             Event(
                 id = dto.id,
                 name = dto.name,
                 description = dto.description,
-                venue = dto.venue,
+                venue = dto.place,
                 startsAt = dto.startsAt,
                 endsAt = dto.endsAt,
                 ticketTypes = dto.ticketTypes.map { tt ->
@@ -42,7 +42,7 @@ class EventRepositoryImpl(
             id = dto.id,
             name = dto.name,
             description = dto.description,
-            venue = dto.venue,
+            venue = dto.place,
             startsAt = dto.startsAt,
             endsAt = dto.endsAt,
             ticketTypes = dto.ticketTypes.map { tt ->

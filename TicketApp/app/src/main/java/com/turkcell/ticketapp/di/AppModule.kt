@@ -5,6 +5,7 @@ import com.turkcell.ticketapp.viewmodel.EventListViewModel
 import com.turkcell.ticketapp.viewmodel.LoginViewModel
 import com.turkcell.ticketapp.viewmodel.MyTicketsViewModel
 import com.turkcell.ticketapp.viewmodel.RegisterViewModel
+import com.turkcell.ticketapp.viewmodel.TicketDetailViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -18,6 +19,12 @@ val appModule = module {
         EventDetailViewModel(
             eventId = params.get(),
             eventRepository = get(),
+            ticketRepository = get()
+        )
+    }
+    viewModel { params ->
+        TicketDetailViewModel(
+            ticketId = params.get(),
             ticketRepository = get()
         )
     }

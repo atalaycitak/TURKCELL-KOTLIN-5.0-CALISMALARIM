@@ -36,7 +36,9 @@ import com.turkcell.ticketapp.screen.EventListScreen
 import com.turkcell.ticketapp.screen.LoginScreen
 import com.turkcell.ticketapp.screen.MyTicketsScreen
 import com.turkcell.ticketapp.screen.RegisterScreen
+import com.turkcell.ticketapp.screen.TicketDetailScreen
 import com.turkcell.ticketapp.viewmodel.EventDetailViewModel
+import com.turkcell.ticketapp.viewmodel.TicketDetailViewModel
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
@@ -145,7 +147,11 @@ private fun AuthedNavHost(
                 )
             }
             composable<MyTickets> {
-                MyTicketsScreen()
+                MyTicketsScreen(
+                    onTicketClick = { ticketId ->
+                        navController.navigate(TicketDetail(ticketId))
+                    }
+                )
             }
             composable<EventDetail> { backStackEntry ->
                 val route = backStackEntry.toRoute<EventDetail>()
@@ -163,6 +169,16 @@ private fun AuthedNavHost(
                             launchSingleTop = true
                         }
                     }
+                )
+            }
+            composable<TicketDetail> { backStackEntry ->
+                val route = backStackEntry.toRoute<TicketDetail>()
+                val viewModel: TicketDetailViewModel = koinViewModel(
+                    parameters = { parametersOf(route.ticketId) }
+                )
+                TicketDetailScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() }
                 )
             }
         }

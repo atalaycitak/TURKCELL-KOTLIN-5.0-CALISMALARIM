@@ -33,6 +33,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun MyTicketsScreen(
+    onTicketClick: (String) -> Unit,
     viewModel: MyTicketsViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -71,7 +72,10 @@ fun MyTicketsScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(state.tickets, key = { it.id }) { ticket ->
-                    TicketCard(ticket = ticket)
+                    TicketCard(
+                        ticket = ticket,
+                        onClick = { onTicketClick(ticket.id) }
+                    )
                 }
             }
         }
@@ -79,8 +83,12 @@ fun MyTicketsScreen(
 }
 
 @Composable
-private fun TicketCard(ticket: Ticket) {
+private fun TicketCard(
+    ticket: Ticket,
+    onClick: () -> Unit
+) {
     Card(
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {

@@ -7,6 +7,7 @@ data class PurchaseRequest(
 
 interface TicketRepository {
     suspend fun getMyTickets(): Result<List<Ticket>>
+    suspend fun getTicketById(id: String): Result<Ticket>
     suspend fun createPurchase(items: List<PurchaseRequest>): Result<Purchase>
     suspend fun payPurchase(purchaseId: String): Result<Purchase>
 }

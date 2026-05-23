@@ -18,20 +18,24 @@ class TicketRepositoryImpl(
     override suspend fun getMyTickets(): Result<List<Ticket>> = runCatchingApi {
         ticketApi.getMyTickets()
     }.map { dtoList ->
-        dtoList.map { dto ->
-            Ticket(
-                id = dto.id,
-                qrCode = dto.qrCode,
-                status = dto.status,
-                usedAt = dto.usedAt,
-                ticketTypeName = dto.ticketType.name,
-                priceCents = dto.ticketType.priceCents,
-                eventName = dto.ticketType.event.name,
-                venue = dto.ticketType.event.venue,
-                startsAt = dto.ticketType.event.startsAt
-            )
-        }
+        dtoList.map { it.toDomainTicket() }
     }
+
+    override suspend fun getTicketById(id: String): Result<Ticket> = runCatchingApi {
+        ticketApi.getTicketById(id)
+    }.map { it.toDomainTicket() }
+
+    private fun com.turkcell.data.dto.TicketDto.toDomainTicket() = Ticket(
+        id = id,
+        qrCode = qrCode,
+        status = status,
+        usedAt = usedAt,
+        ticketTypeName = ticketType.name,
+        priceCents = ticketType.priceCents,
+        eventName = ticketType.event.name,
+        venue = ticketType.event.place,
+        startsAt = ticketType.event.startsAt
+    )
 
     override suspend fun createPurchase(items: List<PurchaseRequest>): Result<Purchase> = runCatchingApi {
         ticketApi.createPurchase(
