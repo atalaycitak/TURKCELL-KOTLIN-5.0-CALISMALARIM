@@ -4,8 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.turkcell.core.domain.Event
 import com.turkcell.core.domain.EventRepository
+import com.turkcell.core.domain.PurchaseRepository
 import com.turkcell.core.domain.PurchaseRequest
-import com.turkcell.core.domain.TicketRepository
+import com.turkcell.ticketapp.util.toUserMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,7 +28,7 @@ data class EventDetailUiState(
 class EventDetailViewModel(
     private val eventId: String,
     private val eventRepository: EventRepository,
-    private val ticketRepository: TicketRepository
+    private val purchaseRepository: PurchaseRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(EventDetailUiState())
     val state: StateFlow<EventDetailUiState> = _state.asStateFlow()
@@ -36,7 +37,7 @@ class EventDetailViewModel(
         loadEvent()
     }
 
-    private fun loadEvent() {
+    fun loadEvent() {
         _state.update { it.copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
             eventRepository.getEventById(eventId)
@@ -67,7 +68,7 @@ class EventDetailViewModel(
         _state.update { it.copy(isPurchasing = true, errorMessage = null) }
 
         viewModelScope.launch {
-            val createResult = ticketRepository.createPurchase(
+            val createResult = purchaseRepository.createPurchase(
                 listOf(PurchaseRequest(ticketTypeId = ticketTypeId, quantity = current.quantity))
             )
 
@@ -78,7 +79,7 @@ class EventDetailViewModel(
 
             val purchase = createResult.getOrNull() ?: return@launch
 
-            ticketRepository.payPurchase(purchase.id)
+            purchaseRepository.payPurchase(purchase.id)
                 .onSuccess {
                     _state.update { it.copy(isPurchasing = false, purchaseSuccess = true) }
                 }
@@ -92,3 +93,4 @@ class EventDetailViewModel(
         _state.update { it.copy(purchaseSuccess = false) }
     }
 }
+

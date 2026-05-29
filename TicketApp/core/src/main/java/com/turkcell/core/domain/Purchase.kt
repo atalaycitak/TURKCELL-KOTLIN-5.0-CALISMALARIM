@@ -8,7 +8,7 @@ data class PurchaseItem(
 
 data class Purchase(
     val id: String,
-    val status: String,
+    val status: PurchaseStatus,
     val totalCents: Int,
     val items: List<PurchaseItem>,
     val tickets: List<Ticket>

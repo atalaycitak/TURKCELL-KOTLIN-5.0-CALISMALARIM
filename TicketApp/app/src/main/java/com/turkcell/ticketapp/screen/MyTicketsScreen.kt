@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.turkcell.core.domain.Ticket
+import com.turkcell.core.domain.TicketStatus
 import com.turkcell.core.util.DateFormatter
 import com.turkcell.ticketapp.viewmodel.MyTicketsViewModel
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
@@ -121,9 +122,9 @@ private fun TicketCard(
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                text = if (ticket.status == "VALID") "Gecerli" else "Kullanilmis",
+                text = if (ticket.status == TicketStatus.VALID) "Gecerli" else "Kullanilmis",
                 style = MaterialTheme.typography.labelMedium,
-                color = if (ticket.status == "VALID")
+                color = if (ticket.status == TicketStatus.VALID)
                     MaterialTheme.colorScheme.primary
                 else
                     MaterialTheme.colorScheme.onSurfaceVariant

@@ -1,3 +1,4 @@
+
 # Ticket API — Mobil Geliştirici Dokümanı
 
 Bu doküman, Kotlin mobil uygulamanın tüketeceği REST API'yi anlatır. API Express.js + PostgreSQL üzerinde çalışır.
@@ -154,25 +155,30 @@ Refresh token'ı sunucudan iptal eder. Cihazdaki tokenları da silmeyi unutmayı
 ### 5.2 Etkinlikler (genel)
 
 #### `GET /events`
-Etkinlik listesi. Her bilet türü için **kalan** kapasiteyi (`remaining = capacity - soldCount`) içerir. Mobil bunu doğrudan gösterebilir.
+Etkinlikleri listeler.
 
-- **Yetki:** Public
+- **Yetki:** Authenticated
 - **Query parametreleri**
-    - `upcoming=true` — yalnızca başlangıcı gelecekte olan etkinlikler
+    - `upcoming` (opsiyonel) — `true` veya `false`. Yalnızca gelecekteki etkinlikleri filtreler.
 - **200 Response**
   ```json
   [
     {
       "id": "uuid",
-      "name": "Demo Konseri",
-      "description": "...",
-      "venue": "Ana Sahne, İstanbul",
+      "name": "Konser",
+      "description": "Açıklama",
+      "place": "İstanbul",
       "startsAt": "2026-05-19T18:00:00.000Z",
       "endsAt": "2026-05-19T22:00:00.000Z",
-      "createdAt": "2026-05-05T12:00:00.000Z",
       "ticketTypes": [
-        { "id": "uuid", "name": "VIP", "priceCents": 50000, "capacity": 50, "soldCount": 3, "remaining": 47 },
-        { "id": "uuid", "name": "Standart", "priceCents": 20000, "capacity": 200, "soldCount": 12, "remaining": 188 }
+        {
+          "id": "uuid",
+          "name": "VIP",
+          "priceCents": 20000,
+          "capacity": 100,
+          "soldCount": 5,
+          "remaining": 95
+        }
       ]
     }
   ]
@@ -181,97 +187,110 @@ Etkinlik listesi. Her bilet türü için **kalan** kapasiteyi (`remaining = capa
 ---
 
 #### `GET /events/{id}`
-Tek etkinliğin tüm detayı (yukarıdaki yapıdan tek obje).
+Tekil etkinlik detayı.
 
-- **Yetki:** Public
+- **Yetki:** Authenticated
+- **Path parametresi:** `id` — UUID
+- **200 Response:** Yukarıdaki Event nesnesiyle aynı yapı.
 - **Hatalar:** 404 `event_not_found`
 
 ---
 
-### 5.3 Sat Alımlar
+### 5.3 Satın Alma
 
 #### `POST /purchases`
-Yeni sat alım oluşturur. **Stok burada düşmez** — yalnızca `PENDING` durumunda kayıt açılır ve fiyatlar bu anda snapshot'lanır. Stok düşmesi `pay` çağrısında olur.
+Yeni satın alım oluşturur. Durum **PENDING** olarak döner.
 
-- **Yetki:** USER veya ADMIN
+- **Yetki:** USER
 - **Request**
   ```json
   {
     "items": [
-      { "ticketTypeId": "uuid", "quantity": 2 },
-      { "ticketTypeId": "uuid", "quantity": 1 }
+      { "ticketTypeId": "uuid", "quantity": 2 }
     ]
   }
   ```
-    - `quantity` — 1–20 arası
-    - `items` — 1–20 satır arası
+    - `ticketTypeId` — UUID, geçerli bir bilet türü
+    - `quantity` — 1–20 arası integer
 - **201 Response**
   ```json
   {
     "id": "uuid",
-    "userId": "uuid",
     "status": "PENDING",
-    "totalCents": 120000,
-    "createdAt": "...",
+    "totalCents": 40000,
     "paidAt": null,
     "items": [
-      { "id": "uuid", "ticketTypeId": "uuid", "quantity": 2, "unitPriceCents": 50000 },
-      { "id": "uuid", "ticketTypeId": "uuid", "quantity": 1, "unitPriceCents": 20000 }
-    ]
+      {
+        "id": "uuid",
+        "ticketTypeId": "uuid",
+        "quantity": 2,
+        "unitPriceCents": 20000
+      }
+    ],
+    "tickets": []
   }
   ```
-- **Hatalar:** 400, 404 `ticket_type_not_found`, 409 `capacity_exceeded`
+- **Hatalar:** 400 `validation_error`, 409 `capacity_exceeded`
 
 ---
 
 #### `POST /purchases/{id}/pay`
-**Mock ödeme.** Bir transaction içinde:
-1. Her bilet türünde `soldCount + qty <= capacity` atomik kontrol → ihlal varsa `409 capacity_exceeded`.
-2. `soldCount` artırılır.
-3. Her quantity için bir **Ticket** kaydı (`status: VALID`, `qrCode = uuid v4`) oluşturulur.
-4. Purchase `PAID` olur, `paidAt` set edilir.
+Mock ödeme işlemi. Başarılıysa durum **PAID** olur ve biletler üretilir.
 
-> Gerçek bir PSP entegrasyonu eklendiğinde mobilin gönderdiği gövde değişebilir; şu an boş gövde yeterli.
-
-- **Yetki:** USER veya ADMIN (yalnızca sat alım sahibi)
+- **Yetki:** USER (satın alım sahibi)
+- **Path parametresi:** `id` — UUID
 - **Request:** Boş gövde
 - **200 Response**
   ```json
   {
     "id": "uuid",
     "status": "PAID",
-    "paidAt": "...",
-    "totalCents": 120000,
-    "items": [...],
+    "totalCents": 40000,
+    "paidAt": "2026-05-19T18:05:00.000Z",
+    "items": [
+      {
+        "id": "uuid",
+        "ticketTypeId": "uuid",
+        "quantity": 2,
+        "unitPriceCents": 20000
+      }
+    ],
     "tickets": [
-      { "id": "uuid", "qrCode": "uuid-v4", "status": "VALID", "ticketTypeId": "uuid" }
+      {
+        "id": "uuid",
+        "qrCode": "uuid",
+        "status": "VALID",
+        "ticketTypeId": "uuid"
+      }
     ]
   }
   ```
-- **Hatalar:** 403 `not_purchase_owner`, 404 `purchase_not_found`, 409 `already_paid`, 409 `capacity_exceeded`
+- **Hatalar:** 403 `not_purchase_owner`, 404 `purchase_not_found`, 409 `already_paid`
 
 ---
 
 #### `GET /purchases/{id}`
-Sat alımın detayı + üretilmiş biletler.
+Tekil satın alım detayı.
 
-- **Yetki:** USER veya ADMIN (sahip)
-- **Hatalar:** 404 `purchase_not_found`
+- **Yetki:** USER (satın alım sahibi)
+- **Path parametresi:** `id` — UUID
+- **200 Response:** Yukarıdaki Purchase yapısıyla aynı.
+- **Hatalar:** 403 `not_purchase_owner`, 404 `purchase_not_found`
 
 ---
 
-### 5.4 Bana Ait (Me)
+### 5.4 Kullanıcı (Me)
 
 #### `GET /me/purchases`
-Kullanıcının tüm sat alımları (PENDING + PAID).
+Giriş yapmış kullanıcının tüm satın alımlarını listeler.
 
 - **Yetki:** Authenticated
-- **200 Response:** `Purchase[]` (tickets dahil değil, hızlı liste)
+- **200 Response:** `Purchase[]` — Yukarıdaki yapıda dizi.
 
 ---
 
 #### `GET /me/tickets`
-Kullanıcının tüm biletleri. Her bilet, etkinlik ve bilet türü bilgisini içerir — mobil "Biletlerim" ekranı için hazır veridir.
+Giriş yapmış kullanıcının tüm biletlerini listeler.
 
 - **Yetki:** Authenticated
 - **200 Response**
@@ -279,18 +298,17 @@ Kullanıcının tüm biletleri. Her bilet, etkinlik ve bilet türü bilgisini i�
   [
     {
       "id": "uuid",
-      "qrCode": "uuid-v4",
+      "qrCode": "uuid",
       "status": "VALID",
       "usedAt": null,
-      "checkedInBy": null,
       "ticketType": {
         "id": "uuid",
         "name": "VIP",
-        "priceCents": 50000,
+        "priceCents": 20000,
         "event": {
           "id": "uuid",
-          "name": "Demo Konseri",
-          "venue": "Ana Sahne, İstanbul",
+          "name": "Konser",
+          "place": "İstanbul",
           "startsAt": "2026-05-19T18:00:00.000Z"
         }
       }
@@ -301,110 +319,143 @@ Kullanıcının tüm biletleri. Her bilet, etkinlik ve bilet türü bilgisini i�
 ---
 
 #### `GET /me/tickets/{id}`
-Tek biletin tam detayı. **Mobilin QR ekranı için ana endpoint.** `qrCode` alanını QR koduna çevirip gösterin.
+Tekil bilet detayı.
 
-- **Yetki:** Authenticated (sahip)
+- **Yetki:** Authenticated
+- **Path parametresi:** `id` — UUID
+- **200 Response:** Yukarıdaki Ticket yapısıyla aynı.
 - **Hatalar:** 404 `ticket_not_found`
-
-> QR'da yalnızca `qrCode` UUID'si bulunur (örn. `b3a1c4...`). Ekstra payload eklemeyin — staff tarafı bu değeri tek başına bekler.
 
 ---
 
-### 5.5 Check-in (Staff)
+### 5.5 Admin
+
+#### `POST /admin/events`
+Yeni etkinlik oluşturur.
+
+- **Yetki:** ADMIN
+- **Request**
+  ```json
+  {
+    "name": "Konser",
+    "description": "Açıklama",
+    "place": "İstanbul",
+    "startsAt": "2026-05-19T18:00:00.000Z",
+    "endsAt": "2026-05-19T22:00:00.000Z"
+  }
+  ```
+- **201 Response:** Event nesnesi.
+- **Hatalar:** 400 `validation_error`, 403 `forbidden`
+
+---
+
+#### `PATCH /admin/events/{id}`
+Etkinlik günceller.
+
+- **Yetki:** ADMIN
+- **Path parametresi:** `id` — UUID
+- **Request:** EventCreate ile aynı yapı (kısmi güncelleme).
+- **200 Response:** Güncellenmiş Event nesnesi.
+- **Hatalar:** 403 `forbidden`, 404 `event_not_found`
+
+---
+
+#### `DELETE /admin/events/{id}`
+Etkinlik siler.
+
+- **Yetki:** ADMIN
+- **Path parametresi:** `id` — UUID
+- **204 Response:** Boş
+- **Hatalar:** 403 `forbidden`, 404 `event_not_found`
+
+---
+
+#### `GET /admin/events/{id}/sales`
+Etkinliğin satış özetini döner.
+
+- **Yetki:** ADMIN
+- **Path parametresi:** `id` — UUID
+- **200 Response:** Satış özet nesnesi.
+- **Hatalar:** 403 `forbidden`, 404 `event_not_found`
+
+---
+
+#### `POST /admin/events/{id}/ticket-types`
+Etkinliğe yeni bilet türü ekler.
+
+- **Yetki:** ADMIN
+- **Path parametresi:** `id` — UUID (etkinlik)
+- **Request**
+  ```json
+  {
+    "name": "VIP",
+    "priceCents": 20000,
+    "capacity": 100
+  }
+  ```
+    - `priceCents` — 0 veya üzeri integer
+    - `capacity` — 1 veya üzeri integer
+- **201 Response:** TicketType nesnesi.
+- **Hatalar:** 400 `validation_error`, 403 `forbidden`, 404 `event_not_found`
+
+---
+
+#### `PATCH /admin/ticket-types/{id}`
+Bilet türünü günceller.
+
+- **Yetki:** ADMIN
+- **Path parametresi:** `id` — UUID (bilet türü)
+- **Request:** TicketTypeCreate ile aynı yapı.
+- **200 Response:** Güncellenmiş TicketType nesnesi.
+- **Hatalar:** 403 `forbidden`, 404 `ticket_type_not_found`
+
+---
+
+#### `POST /admin/events/{eventId}/staff/{userId}`
+Etkinliğe staff atar.
+
+- **Yetki:** ADMIN
+- **Path parametreleri:** `eventId`, `userId` — UUID
+- **201 Response:** Boş
+- **Hatalar:** 403 `forbidden`, 404 `event_not_found`
+
+---
+
+#### `DELETE /admin/events/{eventId}/staff/{userId}`
+Etkinlikten staff atamasını kaldırır.
+
+- **Yetki:** ADMIN
+- **Path parametreleri:** `eventId`, `userId` — UUID
+- **204 Response:** Boş
+- **Hatalar:** 403 `forbidden`
+
+---
+
+### 5.6 Check-in (Staff)
 
 #### `GET /checkin/events`
-Giriş yapan staff'ın atandığı etkinliklerin listesi. Mobil "Hangi etkinliği tarıyorum?" ekranı için.
+Staff'ın atandığı etkinlikleri listeler.
 
-- **Yetki:** STAFF veya ADMIN
+- **Yetki:** STAFF / ADMIN
 - **200 Response:** `Event[]`
 
 ---
 
 #### `POST /checkin/scan`
-QR taramasının ardından **tek bilet** kontrolü ve check-in.
+QR kod tarayarak bileti kullanılmış olarak işaretler.
 
-- **Yetki:** STAFF veya ADMIN
+- **Yetki:** STAFF / ADMIN (etkinliğe atanmış olmalı)
 - **Request**
   ```json
-  { "qrCode": "b3a1c4d6-..." }
+  { "qrCode": "uuid" }
   ```
 - **200 Response**
   ```json
   {
     "ticketId": "uuid",
     "ticketType": "VIP",
-    "event": {
-      "id": "uuid",
-      "name": "Demo Konseri",
-      "venue": "Ana Sahne, İstanbul",
-      "startsAt": "2026-05-19T18:00:00.000Z"
-    },
-    "checkedInAt": "2026-05-19T18:05:30.123Z"
+    "event": { "...Event nesnesi..." },
+    "checkedInAt": "2026-05-19T18:30:00.000Z"
   }
   ```
-- **Hatalar:**
-    - `404 ticket_not_found` → bilet yok / sahte QR
-    - `403 not_assigned` → staff bu etkinliğe atanmamış
-    - `409 already_used` → bilet daha önce taranmış (mobil "Bu bilet kullanılmış" toast'ı göstermeli)
-
-> Endpoint **idempotent değildir.** Aynı QR için ikinci çağrı 409 döner — bu beklenen ve doğru davranıştır.
-
----
-
-### 5.6 Admin
-
-> Tüm `/admin/*` endpoint'leri ADMIN rolü ister; mobil "User" tarafında genelde kullanılmaz, ama panel/test amaçlı belirtilmiştir.
-
-| Method | Path | Açıklama |
-| --- | --- | --- |
-| `POST` | `/admin/events` | Yeni etkinlik |
-| `PATCH` | `/admin/events/{id}` | Etkinlik güncelle |
-| `DELETE` | `/admin/events/{id}` | Etkinlik sil (cascade ile bilet türleri/biletler düşer) |
-| `GET` | `/admin/events/{id}/sales` | Bilet türü bazında satılan/kalan/gelir özeti |
-| `POST` | `/admin/events/{id}/ticket-types` | Bilet türü ekle |
-| `PATCH` | `/admin/ticket-types/{id}` | Bilet türü güncelle |
-| `POST` | `/admin/events/{eventId}/staff/{userId}` | STAFF rolündeki kullanıcıyı etkinliğe ata |
-| `DELETE` | `/admin/events/{eventId}/staff/{userId}` | Atamayı kaldır |
-
-**Ek not:** `POST /admin/events/{eventId}/staff/{userId}` çağrısında hedef kullanıcının rolü **STAFF** olmalı; aksi halde `400 not_staff`.
-
----
-
-## 6. Diğer
-
-### `GET /health`
-Basit sağlık kontrolü. `200 { "ok": true }`. Mobilin gerek yoktur ama monitoring araçları için mevcuttur.
-
-### `GET /docs`
-Swagger UI — interaktif API explorer. Token'ı sağ üstteki "Authorize" butonuyla girip bütün endpointleri tarayıcıdan deneyebilirsiniz.
-
----
-
-## 7. Mobil Tipik Akışlar
-
-### Bilet Alma (USER)
-1. `POST /auth/login`
-2. `GET /events?upcoming=true`
-3. Kullanıcı bilet türünü ve adedi seçer
-4. `POST /purchases` → `purchase.id`
-5. Ödeme ekranı (mock için doğrudan): `POST /purchases/:id/pay`
-6. Yanıttaki `tickets[]` ile başarı ekranı + Biletlerim'e yönlendir
-7. `GET /me/tickets` → liste
-8. `GET /me/tickets/:id` → QR ekranı (`qrCode` alanını QR'a çevir)
-
-### Kapıda Check-in (STAFF)
-1. `POST /auth/login` (staff hesabı)
-2. `GET /checkin/events` → atandığı etkinlikleri seç
-3. Kamera ile QR oku → string al
-4. `POST /checkin/scan` { "qrCode": "..." } → success / 409 / 403 / 404 mesajına göre UI güncelle
-
----
-
-## 8. Bilinen Sınırlamalar (MVP)
-
-- **Gerçek ödeme yok** — `pay` her zaman başarılı. Iyzico/Stripe entegrasyonu sonra.
-- **İade / iptal yok.**
-- **Email doğrulama / şifre sıfırlama yok.**
-- **Push bildirim yok.**
-- **Rate limit yok** — istemcide kötü niyetli kullanım varsayılmıyor.
-- **Tek dil** — sunucu hata mesajları Türkçe; yerelleştirme istemcide yapılır.
+- **Hatalar:** 403 `not_assigned`, 404 `ticket_not_found`, 409 `already_used`

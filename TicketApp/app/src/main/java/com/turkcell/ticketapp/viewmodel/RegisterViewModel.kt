@@ -3,6 +3,7 @@ package com.turkcell.ticketapp.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.turkcell.core.domain.AuthRepository
+import com.turkcell.ticketapp.util.toUserMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +19,11 @@ data class RegisterUiState(
     val isRegistered: Boolean = false
 ) {
     val canSubmit: Boolean
-        get() = email.isNotBlank() && password.length >= 8 && confirmPassword == password && !isLoading
+        get() = email.isNotBlank()
+                && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+                && password.length in 8..128
+                && confirmPassword == password
+                && !isLoading
 }
 
 class RegisterViewModel(

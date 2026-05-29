@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.turkcell.core.domain.TicketStatus
 import com.turkcell.core.util.DateFormatter
 import com.turkcell.ticketapp.viewmodel.TicketDetailViewModel
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
@@ -126,7 +127,7 @@ fun TicketDetailScreen(
                     Spacer(Modifier.height(8.dp))
                     DetailRow(
                         label = "Durum",
-                        value = if (ticket.status == "VALID") "Gecerli" else "Kullanilmis"
+                        value = if (ticket.status == TicketStatus.VALID) "Gecerli" else "Kullanilmis"
                     )
 
                     Spacer(Modifier.height(24.dp))
