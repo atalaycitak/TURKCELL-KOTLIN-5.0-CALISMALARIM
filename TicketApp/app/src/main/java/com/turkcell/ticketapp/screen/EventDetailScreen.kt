@@ -39,10 +39,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.turkcell.core.util.DateFormatter
+import com.turkcell.ticketapp.R
 import com.turkcell.ticketapp.viewmodel.EventDetailViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,17 +67,17 @@ fun EventDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(state.event?.name ?: "Etkinlik Detay") },
+                title = { Text(state.event?.name ?: stringResource(R.string.event_detail_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Geri")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
         }
     ) { padding ->
         when {
-            state.isLoading -> {
+            state.isLoading && state.event == null -> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -83,6 +85,26 @@ fun EventDetailScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
+                }
+            }
+            state.errorMessage != null && state.event == null -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = state.errorMessage!!,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Spacer(Modifier.height(16.dp))
+                        TextButton(onClick = viewModel::loadEvent) {
+                            Text(stringResource(R.string.retry))
+                        }
+                    }
                 }
             }
             state.event == null -> {
@@ -93,8 +115,8 @@ fun EventDetailScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = state.errorMessage ?: "Etkinlik bulunamadi",
-                        color = MaterialTheme.colorScheme.error
+                        text = stringResource(R.string.event_not_found),
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
             }
@@ -128,7 +150,7 @@ fun EventDetailScreen(
 
                     Spacer(Modifier.height(24.dp))
                     Text(
-                        text = "Bilet Turu Secin",
+                        text = stringResource(R.string.ticket_type_select),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -153,13 +175,17 @@ fun EventDetailScreen(
                                     style = MaterialTheme.typography.bodyLarge
                                 )
                                 Text(
-                                    text = "Kalan: ${ticketType.remaining}",
+                                    text = stringResource(R.string.remaining_format, ticketType.remaining),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                             Text(
-                                text = "${ticketType.priceCents / 100}.${"%02d".format(ticketType.priceCents % 100)} TL",
+                                text = stringResource(
+                                    R.string.price_format,
+                                    ticketType.priceCents / 100,
+                                    "%02d".format(ticketType.priceCents % 100)
+                                ),
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.Medium
                             )
@@ -168,7 +194,7 @@ fun EventDetailScreen(
 
                     Spacer(Modifier.height(16.dp))
                     Text(
-                        text = "Adet",
+                        text = stringResource(R.string.quantity_label),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -178,7 +204,7 @@ fun EventDetailScreen(
                             onClick = { viewModel.setQuantity(state.quantity - 1) },
                             enabled = state.quantity > 1
                         ) {
-                            Icon(Icons.Default.Remove, contentDescription = "Azalt")
+                            Icon(Icons.Default.Remove, contentDescription = stringResource(R.string.decrease))
                         }
                         Text(
                             text = "${state.quantity}",
@@ -189,7 +215,7 @@ fun EventDetailScreen(
                             onClick = { viewModel.setQuantity(state.quantity + 1) },
                             enabled = state.quantity < 20
                         ) {
-                            Icon(Icons.Default.Add, contentDescription = "Artir")
+                            Icon(Icons.Default.Add, contentDescription = stringResource(R.string.increase))
                         }
                     }
 
@@ -200,6 +226,10 @@ fun EventDetailScreen(
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodyMedium
                         )
+                        Spacer(Modifier.height(4.dp))
+                        TextButton(onClick = viewModel::loadEvent) {
+                            Text(stringResource(R.string.retry))
+                        }
                     }
 
                     Spacer(Modifier.height(24.dp))
@@ -215,7 +245,7 @@ fun EventDetailScreen(
                                 color = LocalContentColor.current
                             )
                         } else {
-                            Text("Satin Al")
+                            Text(stringResource(R.string.purchase_button))
                         }
                     }
                 }
@@ -223,13 +253,18 @@ fun EventDetailScreen(
                 if (showConfirmDialog) {
                     val selectedType = event.ticketTypes.find { it.id == state.selectedTicketTypeId }
                     val totalCents = (selectedType?.priceCents ?: 0) * state.quantity
+                    val totalFormatted = "${totalCents / 100}.${"%02d".format(totalCents % 100)}"
                     AlertDialog(
                         onDismissRequest = { showConfirmDialog = false },
-                        title = { Text("Satin Alma Onayi") },
+                        title = { Text(stringResource(R.string.purchase_confirm_title)) },
                         text = {
                             Text(
-                                "${selectedType?.name ?: ""} x${state.quantity}\n" +
-                                "Toplam: ${totalCents / 100}.${"%02d".format(totalCents % 100)} TL"
+                                stringResource(
+                                    R.string.purchase_confirm_body,
+                                    selectedType?.name ?: "",
+                                    state.quantity,
+                                    totalFormatted
+                                )
                             )
                         },
                         confirmButton = {
@@ -237,12 +272,12 @@ fun EventDetailScreen(
                                 showConfirmDialog = false
                                 viewModel.purchase()
                             }) {
-                                Text("Onayla")
+                                Text(stringResource(R.string.confirm))
                             }
                         },
                         dismissButton = {
                             TextButton(onClick = { showConfirmDialog = false }) {
-                                Text("Iptal")
+                                Text(stringResource(R.string.cancel))
                             }
                         }
                     )

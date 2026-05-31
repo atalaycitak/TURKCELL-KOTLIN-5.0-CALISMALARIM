@@ -15,21 +15,26 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.turkcell.core.domain.Ticket
 import com.turkcell.core.domain.TicketStatus
 import com.turkcell.core.util.DateFormatter
+import com.turkcell.ticketapp.R
+import com.turkcell.ticketapp.util.generateQrCode
 import com.turkcell.ticketapp.viewmodel.MyTicketsViewModel
-import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -55,28 +60,35 @@ fun MyTicketsScreen(
                     )
                     Spacer(Modifier.height(16.dp))
                     TextButton(onClick = viewModel::refresh) {
-                        Text("Tekrar Dene")
+                        Text(stringResource(R.string.retry))
                     }
                 }
             }
         }
         state.tickets.isEmpty() -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Henuz biletiniz yok", style = MaterialTheme.typography.bodyLarge)
+                Text(stringResource(R.string.tickets_empty), style = MaterialTheme.typography.bodyLarge)
             }
         }
         else -> {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            @OptIn(ExperimentalMaterial3Api::class)
+            PullToRefreshBox(
+                isRefreshing = state.isLoading,
+                onRefresh = viewModel::refresh,
+                modifier = Modifier.fillMaxSize()
             ) {
-                items(state.tickets, key = { it.id }) { ticket ->
-                    TicketCard(
-                        ticket = ticket,
-                        onClick = { onTicketClick(ticket.id) }
-                    )
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(state.tickets, key = { it.id }) { ticket ->
+                        TicketCard(
+                            ticket = ticket,
+                            onClick = { onTicketClick(ticket.id) }
+                        )
+                    }
                 }
             }
         }
@@ -116,13 +128,21 @@ private fun TicketCard(
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                text = "${ticket.ticketTypeName} - ${ticket.priceCents / 100}.${"%02d".format(ticket.priceCents % 100)} TL",
+                text = stringResource(
+                    R.string.price_with_name_format,
+                    ticket.ticketTypeName,
+                    ticket.priceCents / 100,
+                    "%02d".format(ticket.priceCents % 100)
+                ),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                text = if (ticket.status == TicketStatus.VALID) "Gecerli" else "Kullanilmis",
+                text = if (ticket.status == TicketStatus.VALID)
+                    stringResource(R.string.status_valid)
+                else
+                    stringResource(R.string.status_used),
                 style = MaterialTheme.typography.labelMedium,
                 color = if (ticket.status == TicketStatus.VALID)
                     MaterialTheme.colorScheme.primary
@@ -131,12 +151,18 @@ private fun TicketCard(
             )
             Spacer(Modifier.height(12.dp))
 
-            val qrPainter = rememberQrCodePainter(data = ticket.qrCode)
-            Image(
-                painter = qrPainter,
-                contentDescription = "QR Kod",
-                modifier = Modifier.size(160.dp)
-            )
+            val qrBitmap = remember(ticket.qrCode) { generateQrCode(ticket.qrCode) }
+            if (qrBitmap != null) {
+                Image(
+                    bitmap = qrBitmap,
+                    contentDescription = stringResource(R.string.qr_code),
+                    modifier = Modifier.size(160.dp)
+                )
+            } else {
+                Box(modifier = Modifier.size(160.dp), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
         }
     }
 }

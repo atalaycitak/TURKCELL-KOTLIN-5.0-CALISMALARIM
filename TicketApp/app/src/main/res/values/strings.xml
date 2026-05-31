@@ -1,3 +1,73 @@
 <resources>
     <string name="app_name">Ticket App</string>
+
+    <!-- Genel -->
+    <string name="retry">Tekrar Dene</string>
+    <string name="back">Geri</string>
+    <string name="cancel">Iptal</string>
+    <string name="confirm">Onayla</string>
+
+    <!-- Navigation -->
+    <string name="top_bar_title">TicketApp</string>
+    <string name="nav_events">Etkinlikler</string>
+    <string name="nav_my_tickets">Biletlerim</string>
+    <string name="logout">Cikis Yap</string>
+
+    <!-- Login -->
+    <string name="login_title">Giris Yap</string>
+    <string name="label_email">Email</string>
+    <string name="label_password">Sifre</string>
+    <string name="login_button">Giris Yap</string>
+    <string name="login_navigate_register">Hesabin yok mu? Kayit ol</string>
+
+    <!-- Register -->
+    <string name="register_title">Kayit Ol</string>
+    <string name="label_password_confirm">Sifre Tekrar</string>
+    <string name="register_button">Kayit Ol</string>
+    <string name="register_navigate_login">Zaten hesabin var mi? Giris yap</string>
+
+    <!-- Event List -->
+    <string name="events_empty">Yaklasan etkinlik bulunamadi</string>
+
+    <!-- Event Detail -->
+    <string name="event_detail_title">Etkinlik Detay</string>
+    <string name="event_not_found">Etkinlik bulunamadi</string>
+    <string name="ticket_type_select">Bilet Turu Secin</string>
+    <string name="remaining_format">Kalan: %d</string>
+    <string name="quantity_label">Adet</string>
+    <string name="decrease">Azalt</string>
+    <string name="increase">Artir</string>
+    <string name="purchase_button">Satin Al</string>
+    <string name="purchase_confirm_title">Satin Alma Onayi</string>
+    <string name="purchase_confirm_body">%1$s x%2$d\nToplam: %3$s TL</string>
+
+    <!-- My Tickets -->
+    <string name="tickets_empty">Henuz biletiniz yok</string>
+    <string name="status_valid">Gecerli</string>
+    <string name="status_used">Kullanilmis</string>
+    <string name="qr_code">QR Kod</string>
+
+    <!-- Ticket Detail -->
+    <string name="ticket_detail_title">Bilet Detay</string>
+    <string name="detail_label_ticket_type">Bilet Turu</string>
+    <string name="detail_label_price">Fiyat</string>
+    <string name="detail_label_status">Durum</string>
+
+    <!-- Fiyat formati -->
+    <string name="price_format">%1$d.%2$s TL</string>
+    <string name="price_with_name_format">%1$s - %2$d.%3$s TL</string>
+
+    <!-- Hata mesajlari -->
+    <string name="error_invalid_credentials">Email veya sifre hatali</string>
+    <string name="error_forbidden">Bu islemi yapmaya yetkiniz yok</string>
+    <string name="error_not_found">Kayit bulunamadi</string>
+    <string name="error_server">Sunucu su anda cevap veremiyor</string>
+    <string name="error_unexpected">Beklenmeyen bir hata olustu (HTTP %d)</string>
+    <string name="error_no_internet">Internet baglantisi yok</string>
+    <string name="error_unknown">Bilinmeyen bir hata olustu.</string>
+    <string name="error_email_taken">Bu email zaten kayitli</string>
+    <string name="error_capacity_exceeded">Stok yetersiz, etkinligi yenileyin</string>
+    <string name="error_already_paid">Bu satin alim zaten odenmis</string>
+    <string name="error_already_used">Bu bilet daha once kullanilmis</string>
+    <string name="error_conflict">Islem catismasi olustu</string>
 </resources>

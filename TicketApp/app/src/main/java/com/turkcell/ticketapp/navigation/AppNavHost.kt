@@ -43,6 +43,8 @@ import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 import org.koin.androidx.compose.koinViewModel
+import androidx.compose.ui.res.stringResource
+import com.turkcell.ticketapp.R
 
 
 @Composable
@@ -83,12 +85,12 @@ private fun AuthedNavHost(
         topBar = {
             if (showBottomBar) {
                 TopAppBar(
-                    title = { Text("TicketApp") },
+                    title = { Text(stringResource(R.string.top_bar_title)) },
                     actions = {
                         IconButton(onClick = {
                             scope.launch { authRepository.logout() }
                         }) {
-                            Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Cikis Yap")
+                            Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = stringResource(R.string.logout))
                         }
                     }
                 )
@@ -109,7 +111,7 @@ private fun AuthedNavHost(
                             }
                         },
                         icon = { Icon(Icons.Default.Event, contentDescription = null) },
-                        label = { Text("Etkinlikler") }
+                        label = { Text(stringResource(R.string.nav_events)) }
                     )
                     NavigationBarItem(
                         selected = currentDestination?.hasRoute<MyTickets>() == true,
@@ -128,7 +130,7 @@ private fun AuthedNavHost(
                                 contentDescription = null
                             )
                         },
-                        label = { Text("Biletlerim") }
+                        label = { Text(stringResource(R.string.nav_my_tickets)) }
                     )
                 }
             }

@@ -1,5 +1,7 @@
 package com.turkcell.ticketapp.screen
 
+import android.app.Activity
+import android.view.WindowManager
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,16 +26,21 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.turkcell.core.domain.TicketStatus
 import com.turkcell.core.util.DateFormatter
+import com.turkcell.ticketapp.R
+import com.turkcell.ticketapp.util.generateQrCode
 import com.turkcell.ticketapp.viewmodel.TicketDetailViewModel
-import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,14 +49,34 @@ fun TicketDetailScreen(
     onBack: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    DisposableEffect(Unit) {
+        val activity = context as? Activity
+        val window = activity?.window
+        val layoutParams = window?.attributes
+        val originalBrightness = layoutParams?.screenBrightness
+
+        if (layoutParams != null && window != null) {
+            layoutParams.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
+            window.attributes = layoutParams
+        }
+
+        onDispose {
+            if (layoutParams != null && window != null) {
+                layoutParams.screenBrightness = originalBrightness ?: WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+                window.attributes = layoutParams
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(state.ticket?.eventName ?: "Bilet Detay") },
+                title = { Text(state.ticket?.eventName ?: stringResource(R.string.ticket_detail_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Geri")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -81,7 +108,7 @@ fun TicketDetailScreen(
                         )
                         Spacer(Modifier.height(16.dp))
                         TextButton(onClick = viewModel::loadTicket) {
-                            Text("Tekrar Dene")
+                            Text(stringResource(R.string.retry))
                         }
                     }
                 }
@@ -118,16 +145,26 @@ fun TicketDetailScreen(
                     HorizontalDivider()
                     Spacer(Modifier.height(24.dp))
 
-                    DetailRow(label = "Bilet Turu", value = ticket.ticketTypeName)
-                    Spacer(Modifier.height(8.dp))
                     DetailRow(
-                        label = "Fiyat",
-                        value = "${ticket.priceCents / 100}.${"%02d".format(ticket.priceCents % 100)} TL"
+                        label = stringResource(R.string.detail_label_ticket_type),
+                        value = ticket.ticketTypeName
                     )
                     Spacer(Modifier.height(8.dp))
                     DetailRow(
-                        label = "Durum",
-                        value = if (ticket.status == TicketStatus.VALID) "Gecerli" else "Kullanilmis"
+                        label = stringResource(R.string.detail_label_price),
+                        value = stringResource(
+                            R.string.price_format,
+                            ticket.priceCents / 100,
+                            "%02d".format(ticket.priceCents % 100)
+                        )
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    DetailRow(
+                        label = stringResource(R.string.detail_label_status),
+                        value = if (ticket.status == TicketStatus.VALID)
+                            stringResource(R.string.status_valid)
+                        else
+                            stringResource(R.string.status_used)
                     )
 
                     Spacer(Modifier.height(24.dp))
@@ -135,18 +172,24 @@ fun TicketDetailScreen(
                     Spacer(Modifier.height(24.dp))
 
                     Text(
-                        text = "QR Kod",
+                        text = stringResource(R.string.qr_code),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(Modifier.height(12.dp))
 
-                    val qrPainter = rememberQrCodePainter(data = ticket.qrCode)
-                    Image(
-                        painter = qrPainter,
-                        contentDescription = "QR Kod",
-                        modifier = Modifier.size(200.dp)
-                    )
+                    val qrBitmap = remember(ticket.qrCode) { generateQrCode(ticket.qrCode, size = 600) }
+                    if (qrBitmap != null) {
+                        Image(
+                            bitmap = qrBitmap,
+                            contentDescription = stringResource(R.string.qr_code),
+                            modifier = Modifier.size(200.dp)
+                        )
+                    } else {
+                        Box(modifier = Modifier.size(200.dp), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator()
+                        }
+                    }
                 }
             }
         }

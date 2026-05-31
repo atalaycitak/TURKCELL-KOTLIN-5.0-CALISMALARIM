@@ -72,7 +72,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     // QR Code
-    implementation("io.github.alexzhirkevich:qrose:1.1.2")
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 
     // Material Icons Extended
     implementation("androidx.compose.material:material-icons-extended")

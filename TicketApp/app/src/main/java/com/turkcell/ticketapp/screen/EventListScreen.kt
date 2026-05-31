@@ -22,11 +22,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.turkcell.core.domain.Event
 import com.turkcell.core.util.DateFormatter
+import com.turkcell.ticketapp.R
 import com.turkcell.ticketapp.viewmodel.EventListViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -53,14 +55,14 @@ fun EventListScreen(
                     )
                     Spacer(Modifier.height(16.dp))
                     TextButton(onClick = viewModel::refresh) {
-                        Text("Tekrar Dene")
+                        Text(stringResource(R.string.retry))
                     }
                 }
             }
         }
         state.events.isEmpty() -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Yaklasan etkinlik bulunamadi", style = MaterialTheme.typography.bodyLarge)
+                Text(stringResource(R.string.events_empty), style = MaterialTheme.typography.bodyLarge)
             }
         }
         else -> {
@@ -116,7 +118,11 @@ private fun EventCard(event: Event, onClick: () -> Unit) {
                             style = MaterialTheme.typography.bodySmall
                         )
                         Text(
-                            text = "${ticketType.priceCents / 100}.${"%02d".format(ticketType.priceCents % 100)} TL",
+                            text = stringResource(
+                                R.string.price_format,
+                                ticketType.priceCents / 100,
+                                "%02d".format(ticketType.priceCents % 100)
+                            ),
                             style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.Medium
                         )
