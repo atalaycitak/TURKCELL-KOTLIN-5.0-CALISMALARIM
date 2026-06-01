@@ -1,5 +1,6 @@
 package com.turkcell.ticketapp.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.turkcell.core.domain.Ticket
@@ -18,7 +19,8 @@ data class MyTicketsUiState(
 )
 
 class MyTicketsViewModel(
-    private val ticketRepository: TicketRepository
+    private val ticketRepository: TicketRepository,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val _state = MutableStateFlow(MyTicketsUiState())
     val state: StateFlow<MyTicketsUiState> = _state.asStateFlow()

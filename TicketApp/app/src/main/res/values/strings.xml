@@ -70,4 +70,5 @@
     <string name="error_already_paid">Bu satin alim zaten odenmis</string>
     <string name="error_already_used">Bu bilet daha once kullanilmis</string>
     <string name="error_conflict">Islem catismasi olustu</string>
+    <string name="error_passwords_mismatch">Sifreler eslesmiyor</string>
 </resources>

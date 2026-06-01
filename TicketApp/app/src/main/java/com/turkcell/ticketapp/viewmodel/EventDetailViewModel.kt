@@ -1,5 +1,6 @@
 package com.turkcell.ticketapp.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.turkcell.core.domain.Event
@@ -28,9 +29,21 @@ data class EventDetailUiState(
 class EventDetailViewModel(
     private val eventId: String,
     private val eventRepository: EventRepository,
-    private val purchaseRepository: PurchaseRepository
+    private val purchaseRepository: PurchaseRepository,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val _state = MutableStateFlow(EventDetailUiState())
+
+    private companion object {
+        const val KEY_SELECTED_TICKET_TYPE = "selected_ticket_type_id"
+        const val KEY_QUANTITY = "quantity"
+    }
+
+    private val _state = MutableStateFlow(
+        EventDetailUiState(
+            selectedTicketTypeId = savedStateHandle[KEY_SELECTED_TICKET_TYPE],
+            quantity = savedStateHandle[KEY_QUANTITY] ?: 1
+        )
+    )
     val state: StateFlow<EventDetailUiState> = _state.asStateFlow()
 
     init {
@@ -51,11 +64,13 @@ class EventDetailViewModel(
     }
 
     fun selectTicketType(ticketTypeId: String) {
+        savedStateHandle[KEY_SELECTED_TICKET_TYPE] = ticketTypeId
         _state.update { it.copy(selectedTicketTypeId = ticketTypeId, errorMessage = null) }
     }
 
     fun setQuantity(quantity: Int) {
         if (quantity in 1..20) {
+            savedStateHandle[KEY_QUANTITY] = quantity
             _state.update { it.copy(quantity = quantity, errorMessage = null) }
         }
     }
@@ -93,4 +108,3 @@ class EventDetailViewModel(
         _state.update { it.copy(purchaseSuccess = false) }
     }
 }
-

@@ -19,13 +19,15 @@ val appModule = module {
         EventDetailViewModel(
             eventId = params.get(),
             eventRepository = get(),
-            purchaseRepository = get()
+            purchaseRepository = get(),
+            savedStateHandle = get()
         )
     }
     viewModel { params ->
         TicketDetailViewModel(
             ticketId = params.get(),
-            ticketRepository = get()
+            ticketRepository = get(),
+            savedStateHandle = get()
         )
     }
 }
