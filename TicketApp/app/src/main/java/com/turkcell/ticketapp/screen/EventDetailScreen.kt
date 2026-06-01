@@ -122,13 +122,18 @@ fun EventDetailScreen(
             }
             else -> {
                 val event = state.event!!
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .padding(16.dp)
-                        .verticalScroll(rememberScrollState())
+                @OptIn(ExperimentalMaterial3Api::class)
+                androidx.compose.material3.pulltorefresh.PullToRefreshBox(
+                    isRefreshing = state.isLoading,
+                    onRefresh = viewModel::loadEvent,
+                    modifier = Modifier.fillMaxSize().padding(padding)
                 ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
+                            .verticalScroll(rememberScrollState())
+                    ) {
                     Text(
                         text = event.name,
                         style = MaterialTheme.typography.headlineSmall,
@@ -282,6 +287,7 @@ fun EventDetailScreen(
                         }
                     )
                 }
+            }
             }
         }
     }

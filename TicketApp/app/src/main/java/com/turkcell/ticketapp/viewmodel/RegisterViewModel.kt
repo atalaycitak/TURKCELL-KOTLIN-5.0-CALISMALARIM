@@ -1,5 +1,6 @@
 package com.turkcell.ticketapp.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.turkcell.core.domain.AuthRepository
@@ -27,21 +28,46 @@ data class RegisterUiState(
 }
 
 class RegisterViewModel(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val _state = MutableStateFlow(RegisterUiState())
+
+    private companion object {
+        const val KEY_EMAIL = "email"
+        const val KEY_PASSWORD = "password"
+        const val KEY_CONFIRM_PASSWORD = "confirm_password"
+    }
+
+    private val _state = MutableStateFlow(
+        RegisterUiState(
+            email = savedStateHandle[KEY_EMAIL] ?: "",
+            password = savedStateHandle[KEY_PASSWORD] ?: "",
+            confirmPassword = savedStateHandle[KEY_CONFIRM_PASSWORD] ?: ""
+        )
+    )
     val state: StateFlow<RegisterUiState> = _state.asStateFlow()
 
-    fun onEmailChange(value: String) = _state.update { it.copy(email = value, errorMessage = null) }
-    fun onPasswordChange(value: String) = _state.update { it.copy(password = value, errorMessage = null) }
-    fun onConfirmPasswordChange(value: String) = _state.update { it.copy(confirmPassword = value, errorMessage = null) }
+    fun onEmailChange(value: String) {
+        savedStateHandle[KEY_EMAIL] = value
+        _state.update { it.copy(email = value, errorMessage = null) }
+    }
+
+    fun onPasswordChange(value: String) {
+        savedStateHandle[KEY_PASSWORD] = value
+        _state.update { it.copy(password = value, errorMessage = null) }
+    }
+
+    fun onConfirmPasswordChange(value: String) {
+        savedStateHandle[KEY_CONFIRM_PASSWORD] = value
+        _state.update { it.copy(confirmPassword = value, errorMessage = null) }
+    }
 
     fun submit() {
         val current = _state.value
         if (!current.canSubmit) return
 
         if (current.password != current.confirmPassword) {
-            _state.update { it.copy(errorMessage = "Şifreler eşleşmiyor") }
+            _state.update { it.copy(errorMessage = "Sifreler eslesmiyor") }
             return
         }
 

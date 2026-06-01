@@ -1,5 +1,6 @@
 package com.turkcell.ticketapp.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.turkcell.core.domain.AuthRepository
@@ -21,13 +22,33 @@ data class LoginUiState(val email: String = "",
 }
 
 class LoginViewModel(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val _state = MutableStateFlow(LoginUiState())
+
+    private companion object {
+        const val KEY_EMAIL = "email"
+        const val KEY_PASSWORD = "password"
+    }
+
+    private val _state = MutableStateFlow(
+        LoginUiState(
+            email = savedStateHandle[KEY_EMAIL] ?: "",
+            password = savedStateHandle[KEY_PASSWORD] ?: ""
+        )
+    )
     val state: StateFlow<LoginUiState> = _state.asStateFlow()
 
-    fun onEmailChange(value: String) = _state.update { it.copy(email = value, errorMessage = null) }
-    fun onPasswordChange(value: String) = _state.update { it.copy(password = value, errorMessage = null) }
+    fun onEmailChange(value: String) {
+        savedStateHandle[KEY_EMAIL] = value
+        _state.update { it.copy(email = value, errorMessage = null) }
+    }
+
+    fun onPasswordChange(value: String) {
+        savedStateHandle[KEY_PASSWORD] = value
+        _state.update { it.copy(password = value, errorMessage = null) }
+    }
+
     fun consumeError() = _state.update { it.copy(errorMessage = null) }
 
     fun submit() {

@@ -8,6 +8,9 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface PurchaseApi {
+    @GET("/me/purchases")
+    suspend fun getMyPurchases(): List<PurchaseDto>
+
     @POST("/purchases")
     suspend fun createPurchase(@Body body: PurchaseRequestDto): PurchaseDto
 

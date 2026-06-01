@@ -66,14 +66,21 @@ fun EventListScreen(
             }
         }
         else -> {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+            androidx.compose.material3.pulltorefresh.PullToRefreshBox(
+                isRefreshing = state.isLoading,
+                onRefresh = viewModel::refresh,
+                modifier = Modifier.fillMaxSize()
             ) {
-                items(state.events, key = { it.id }) { event ->
-                    EventCard(event = event, onClick = { onEventClick(event.id) })
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(state.events, key = { it.id }) { event ->
+                        EventCard(event = event, onClick = { onEventClick(event.id) })
+                    }
                 }
             }
         }

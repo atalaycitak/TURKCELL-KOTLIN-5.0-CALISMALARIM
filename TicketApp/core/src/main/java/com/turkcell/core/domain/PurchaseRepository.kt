@@ -6,6 +6,7 @@ data class PurchaseRequest(
 )
 
 interface PurchaseRepository {
+    suspend fun getMyPurchases(): Result<List<Purchase>>
     suspend fun createPurchase(items: List<PurchaseRequest>): Result<Purchase>
     suspend fun payPurchase(purchaseId: String): Result<Purchase>
     suspend fun getPurchase(purchaseId: String): Result<Purchase>

@@ -13,6 +13,8 @@ object Events
 @Serializable
 object MyTickets
 @Serializable
+object MyPurchases
+@Serializable
 data class EventDetail(val eventId: String)
 @Serializable
 data class TicketDetail(val ticketId: String)

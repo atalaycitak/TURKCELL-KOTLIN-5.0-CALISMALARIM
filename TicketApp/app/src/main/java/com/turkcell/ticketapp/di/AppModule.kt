@@ -3,6 +3,7 @@ package com.turkcell.ticketapp.di
 import com.turkcell.ticketapp.viewmodel.EventDetailViewModel
 import com.turkcell.ticketapp.viewmodel.EventListViewModel
 import com.turkcell.ticketapp.viewmodel.LoginViewModel
+import com.turkcell.ticketapp.viewmodel.MyPurchasesViewModel
 import com.turkcell.ticketapp.viewmodel.MyTicketsViewModel
 import com.turkcell.ticketapp.viewmodel.RegisterViewModel
 import com.turkcell.ticketapp.viewmodel.TicketDetailViewModel
@@ -15,17 +16,20 @@ val appModule = module {
     viewModelOf(::RegisterViewModel)
     viewModelOf(::EventListViewModel)
     viewModelOf(::MyTicketsViewModel)
+    viewModelOf(::MyPurchasesViewModel)
     viewModel { params ->
         EventDetailViewModel(
             eventId = params.get(),
             eventRepository = get(),
-            purchaseRepository = get()
+            purchaseRepository = get(),
+            savedStateHandle = get()
         )
     }
     viewModel { params ->
         TicketDetailViewModel(
             ticketId = params.get(),
-            ticketRepository = get()
+            ticketRepository = get(),
+            savedStateHandle = get()
         )
     }
 }

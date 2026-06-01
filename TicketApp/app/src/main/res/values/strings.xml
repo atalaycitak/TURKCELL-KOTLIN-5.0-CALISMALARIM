@@ -70,4 +70,15 @@
     <string name="error_already_paid">Bu satin alim zaten odenmis</string>
     <string name="error_already_used">Bu bilet daha once kullanilmis</string>
     <string name="error_conflict">Islem catismasi olustu</string>
+    <string name="error_passwords_mismatch">Sifreler eslesmiyor</string>
+
+    <!-- My Purchases -->
+    <string name="nav_my_purchases">Satin Alimlarim</string>
+    <string name="purchases_empty">Henuz satin aliminiz yok</string>
+    <string name="purchase_status_pending">Odeme Bekliyor</string>
+    <string name="purchase_status_paid">Odendi</string>
+    <string name="purchase_continue_pay">Odemeye devam et</string>
+    <string name="purchase_total_label">Toplam</string>
+    <string name="purchase_items_format">%d kalem</string>
+    <string name="purchase_paying">Odeniyor…</string>
 </resources>

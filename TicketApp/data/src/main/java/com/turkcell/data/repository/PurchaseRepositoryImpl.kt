@@ -17,6 +17,10 @@ class PurchaseRepositoryImpl(
     private val purchaseApi: PurchaseApi
 ) : PurchaseRepository {
 
+    override suspend fun getMyPurchases(): Result<List<Purchase>> = runCatchingApi {
+        purchaseApi.getMyPurchases()
+    }.map { dtos -> dtos.map { it.toDomain() } }
+
     override suspend fun createPurchase(items: List<PurchaseRequest>): Result<Purchase> =
         runCatchingApi {
             purchaseApi.createPurchase(
@@ -51,6 +55,7 @@ class PurchaseRepositoryImpl(
                 venue = "",
                 startsAt = ""
             )
-        }
+        },
+        createdAt = createdAt
     )
 }

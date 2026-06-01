@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ConfirmationNumber
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material3.CircularProgressIndicator
@@ -34,6 +35,7 @@ import com.turkcell.core.domain.AuthRepository
 import com.turkcell.ticketapp.screen.EventDetailScreen
 import com.turkcell.ticketapp.screen.EventListScreen
 import com.turkcell.ticketapp.screen.LoginScreen
+import com.turkcell.ticketapp.screen.MyPurchasesScreen
 import com.turkcell.ticketapp.screen.MyTicketsScreen
 import com.turkcell.ticketapp.screen.RegisterScreen
 import com.turkcell.ticketapp.screen.TicketDetailScreen
@@ -78,7 +80,7 @@ private fun AuthedNavHost(
     val currentDestination = navBackStackEntry?.destination
 
     val showBottomBar = currentDestination?.let {
-        it.hasRoute<Events>() || it.hasRoute<MyTickets>()
+        it.hasRoute<Events>() || it.hasRoute<MyTickets>() || it.hasRoute<MyPurchases>()
     } ?: true
 
     Scaffold(
@@ -132,6 +134,25 @@ private fun AuthedNavHost(
                         },
                         label = { Text(stringResource(R.string.nav_my_tickets)) }
                     )
+                    NavigationBarItem(
+                        selected = currentDestination?.hasRoute<MyPurchases>() == true,
+                        onClick = {
+                            navController.navigate(MyPurchases) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
+                        icon = {
+                            Icon(
+                                Icons.Filled.ShoppingCart,
+                                contentDescription = null
+                            )
+                        },
+                        label = { Text(stringResource(R.string.nav_my_purchases)) }
+                    )
                 }
             }
         }
@@ -154,6 +175,9 @@ private fun AuthedNavHost(
                         navController.navigate(TicketDetail(ticketId))
                     }
                 )
+            }
+            composable<MyPurchases> {
+                MyPurchasesScreen()
             }
             composable<EventDetail> { backStackEntry ->
                 val route = backStackEntry.toRoute<EventDetail>()

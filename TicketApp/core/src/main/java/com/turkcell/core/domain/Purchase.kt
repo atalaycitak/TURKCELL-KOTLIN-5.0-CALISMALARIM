@@ -11,5 +11,6 @@ data class Purchase(
     val status: PurchaseStatus,
     val totalCents: Int,
     val items: List<PurchaseItem>,
-    val tickets: List<Ticket>
+    val tickets: List<Ticket>,
+    val createdAt: String? = null
 )
