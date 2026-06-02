@@ -51,6 +51,7 @@ class EventDetailViewModel(
     }
 
     fun loadEvent() {
+        if (_state.value.isLoading) return
         _state.update { it.copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
             eventRepository.getEventById(eventId)

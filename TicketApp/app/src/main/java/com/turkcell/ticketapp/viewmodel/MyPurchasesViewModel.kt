@@ -38,6 +38,7 @@ class MyPurchasesViewModel(
     }
 
     private fun loadPurchases() {
+        if (_state.value.isLoading) return
         _state.update { it.copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
             purchaseRepository.getMyPurchases()
