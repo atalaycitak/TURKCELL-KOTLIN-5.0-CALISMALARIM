@@ -119,44 +119,46 @@ private fun AuthedNavHost(
                         icon = { Icon(Icons.Default.Event, contentDescription = null) },
                         label = { Text(stringResource(R.string.nav_events)) }
                     )
-                    NavigationBarItem(
-                        selected = currentDestination?.hasRoute<MyTickets>() == true,
-                        onClick = {
-                            navController.navigate(MyTickets) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+                    if (userRole == UserRole.USER) {
+                        NavigationBarItem(
+                            selected = currentDestination?.hasRoute<MyTickets>() == true,
+                            onClick = {
+                                navController.navigate(MyTickets) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        icon = {
-                            Icon(
-                                Icons.Filled.ConfirmationNumber,
-                                contentDescription = null
-                            )
-                        },
-                        label = { Text(stringResource(R.string.nav_my_tickets)) }
-                    )
-                    NavigationBarItem(
-                        selected = currentDestination?.hasRoute<MyPurchases>() == true,
-                        onClick = {
-                            navController.navigate(MyPurchases) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+                            },
+                            icon = {
+                                Icon(
+                                    Icons.Filled.ConfirmationNumber,
+                                    contentDescription = null
+                                )
+                            },
+                            label = { Text(stringResource(R.string.nav_my_tickets)) }
+                        )
+                        NavigationBarItem(
+                            selected = currentDestination?.hasRoute<MyPurchases>() == true,
+                            onClick = {
+                                navController.navigate(MyPurchases) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        icon = {
-                            Icon(
-                                Icons.Filled.ShoppingCart,
-                                contentDescription = null
-                            )
-                        },
-                        label = { Text(stringResource(R.string.nav_my_purchases)) }
-                    )
+                            },
+                            icon = {
+                                Icon(
+                                    Icons.Filled.ShoppingCart,
+                                    contentDescription = null
+                                )
+                            },
+                            label = { Text(stringResource(R.string.nav_my_purchases)) }
+                        )
+                    }
                     if (userRole == UserRole.STAFF || userRole == UserRole.ADMIN) {
                         NavigationBarItem(
                             selected = currentDestination?.hasRoute<Checkin>() == true,
