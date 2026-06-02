@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,6 +33,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.turkcell.core.domain.AuthRepository
+import com.turkcell.core.domain.UserRole
+import com.turkcell.ticketapp.screen.CheckinScreen
 import com.turkcell.ticketapp.screen.EventDetailScreen
 import com.turkcell.ticketapp.screen.EventListScreen
 import com.turkcell.ticketapp.screen.LoginScreen
@@ -78,9 +81,10 @@ private fun AuthedNavHost(
     val scope = rememberCoroutineScope()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+    val userRole by authRepository.userRole.collectAsStateWithLifecycle(initialValue = null)
 
     val showBottomBar = currentDestination?.let {
-        it.hasRoute<Events>() || it.hasRoute<MyTickets>() || it.hasRoute<MyPurchases>()
+        it.hasRoute<Events>() || it.hasRoute<MyTickets>() || it.hasRoute<MyPurchases>() || it.hasRoute<Checkin>()
     } ?: true
 
     Scaffold(
@@ -153,6 +157,22 @@ private fun AuthedNavHost(
                         },
                         label = { Text(stringResource(R.string.nav_my_purchases)) }
                     )
+                    if (userRole == UserRole.STAFF || userRole == UserRole.ADMIN) {
+                        NavigationBarItem(
+                            selected = currentDestination?.hasRoute<Checkin>() == true,
+                            onClick = {
+                                navController.navigate(Checkin) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                            icon = { Icon(Icons.Filled.QrCodeScanner, contentDescription = null) },
+                            label = { Text(stringResource(R.string.nav_checkin)) }
+                        )
+                    }
                 }
             }
         }
@@ -178,6 +198,9 @@ private fun AuthedNavHost(
             }
             composable<MyPurchases> {
                 MyPurchasesScreen()
+            }
+            composable<Checkin> {
+                CheckinScreen()
             }
             composable<EventDetail> { backStackEntry ->
                 val route = backStackEntry.toRoute<EventDetail>()

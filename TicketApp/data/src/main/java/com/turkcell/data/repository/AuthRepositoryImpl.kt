@@ -16,6 +16,7 @@ class AuthRepositoryImpl(
     private val tokenStore: TokenStore
 ) : AuthRepository {
     override val isLoggedIn: Flow<Boolean> = tokenStore.accessToken.map { it != null }
+    override val userRole: Flow<UserRole?> = tokenStore.userRole.map { UserRole.fromApi(it) }
 
     override suspend fun login(
         email: String,
@@ -23,7 +24,7 @@ class AuthRepositoryImpl(
     ): Result<AuthSession> = runCatchingApi {
         authApi.login(CredentialsDto(email = email, password = password))
     }.onSuccess {
-        tokenStore.save(it.accessToken, it.refreshToken)
+        tokenStore.save(it.accessToken, it.refreshToken, it.user.role)
     }.map { dto ->
         AuthSession(
             user = User(dto.user.id, dto.user.email, UserRole.fromApi(dto.user.role)),
@@ -38,7 +39,7 @@ class AuthRepositoryImpl(
     ): Result<AuthSession> = runCatchingApi {
         authApi.register(CredentialsDto(email = email, password = password))
     }.onSuccess {
-        tokenStore.save(it.accessToken, it.refreshToken)
+        tokenStore.save(it.accessToken, it.refreshToken, it.user.role)
     }.map { dto ->
         AuthSession(
             user = User(dto.user.id, dto.user.email, UserRole.fromApi(dto.user.role)),

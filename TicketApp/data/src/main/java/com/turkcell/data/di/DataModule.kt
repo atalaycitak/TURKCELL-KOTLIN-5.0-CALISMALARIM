@@ -8,9 +8,12 @@ import com.turkcell.data.local.TokenStore
 import com.turkcell.data.network.AuthInterceptor
 import com.turkcell.data.network.TokenAuthenticator
 import com.turkcell.data.remote.AuthApi
+import com.turkcell.data.remote.CheckinApi
 import com.turkcell.data.remote.EventApi
 import com.turkcell.data.remote.PurchaseApi
 import com.turkcell.data.remote.TicketApi
+import com.turkcell.data.repository.CheckinRepositoryImpl
+import com.turkcell.core.domain.CheckinRepository
 import com.turkcell.data.repository.AuthRepositoryImpl
 import com.turkcell.data.repository.EventRepositoryImpl
 import com.turkcell.data.repository.PurchaseRepositoryImpl
@@ -95,6 +98,7 @@ val dataModule = module {
     single { get<Retrofit>().create(EventApi::class.java) }
     single { get<Retrofit>().create(TicketApi::class.java) }
     single { get<Retrofit>().create(PurchaseApi::class.java) }
+    single { get<Retrofit>().create(CheckinApi::class.java) }
 
     single<AuthRepository> {
         AuthRepositoryImpl(
@@ -113,5 +117,9 @@ val dataModule = module {
 
     single<PurchaseRepository> {
         PurchaseRepositoryImpl(purchaseApi = get())
+    }
+
+    single<CheckinRepository> {
+        CheckinRepositoryImpl(checkinApi = get())
     }
 }

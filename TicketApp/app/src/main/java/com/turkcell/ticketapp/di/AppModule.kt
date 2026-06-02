@@ -7,6 +7,7 @@ import com.turkcell.ticketapp.viewmodel.MyPurchasesViewModel
 import com.turkcell.ticketapp.viewmodel.MyTicketsViewModel
 import com.turkcell.ticketapp.viewmodel.RegisterViewModel
 import com.turkcell.ticketapp.viewmodel.TicketDetailViewModel
+import com.turkcell.ticketapp.viewmodel.CheckinViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -17,6 +18,7 @@ val appModule = module {
     viewModelOf(::EventListViewModel)
     viewModelOf(::MyTicketsViewModel)
     viewModelOf(::MyPurchasesViewModel)
+    viewModelOf(::CheckinViewModel)
     viewModel { params ->
         EventDetailViewModel(
             eventId = params.get(),

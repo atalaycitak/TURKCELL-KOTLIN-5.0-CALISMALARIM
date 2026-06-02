@@ -81,4 +81,12 @@
     <string name="purchase_total_label">Toplam</string>
     <string name="purchase_items_format">%d kalem</string>
     <string name="purchase_paying">Odeniyor…</string>
+
+    <!-- Checkin -->
+    <string name="nav_checkin">Check-in</string>
+    <string name="checkin_title">Bilet Kontrol</string>
+    <string name="checkin_open_camera">Kamerayi Ac</string>
+    <string name="checkin_success">Bilet Basariyla Onaylandi!</string>
+    <string name="checkin_scan_next">Yeni Bilet Okut</string>
+    <string name="checkin_idle_message">Bilet barkodunu okutmak icin kamerayi acin.</string>
 </resources>
